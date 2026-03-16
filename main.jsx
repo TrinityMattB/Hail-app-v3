@@ -1,4 +1,7 @@
+import { createRoot } from "react-dom/client";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -1460,3 +1463,5 @@ export default function App() {
     </div>
   );
 }
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);
