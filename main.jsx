@@ -397,7 +397,7 @@ function AppHeader({ onLogout }) {
         position: "relative",
       }}>
         <img
-          src="/SWI_Header_FINAL.png"
+          src="/SWI_Header.png"
           alt="Severe Weather Intelligence"
           style={{
             width: "100%",
