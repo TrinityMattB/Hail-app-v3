@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Redis } from "https://esm.sh/@upstash/redis";
+import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
