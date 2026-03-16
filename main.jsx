@@ -387,25 +387,80 @@ function FooterMeasure() {
 
 function AppHeader({ onLogout }) {
   return (
-    <div style={{ background: theme.headerBg, borderBottom: `1px solid ${theme.borderSoft}`, padding: "14px 20px" }}>
-      <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <LogoMark />
-          <div>
-            <div style={{ color: theme.white, fontWeight: 800, fontSize: 21, letterSpacing: 0.5, fontFamily: "Inter, Arial, sans-serif" }}>
-              SEVERE WEATHER INTELLIGENCE
-            </div>
-            <div style={{ color: theme.muted2, fontSize: 11, letterSpacing: 3, textTransform: "uppercase", fontFamily: '"IBM Plex Mono", monospace', marginTop: 4 }}>
-              NOAA storm events database · 5-year lookback
-            </div>
-          </div>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ color: theme.muted2, fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: '"IBM Plex Mono", monospace' }}>Data Source: NOAA NWS</div>
-          <div style={{ color: theme.muted2, fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: '"IBM Plex Mono", monospace' }}>NCEI Storm Events DB</div>
-          <button onClick={onLogout} style={{ marginTop: 10, background: "transparent", color: theme.blue, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "6px 10px", fontSize: 11, cursor: "pointer" }}>
+    <div style={{ position: "relative", width: "100%", background: "#000" }}>
+      {/* Banner image — crops responsively, always shows center */}
+      <div style={{
+        width: "100%",
+        height: "clamp(180px, 22vw, 320px)",
+        overflow: "hidden",
+        position: "relative",
+      }}>
+        <img
+          src="/SWI_Header_FINAL.png"
+          alt="Severe Weather Intelligence"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center 30%",
+            display: "block",
+          }}
+        />
+        {/* Bottom fade to app background */}
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "40%",
+          background: "linear-gradient(to bottom, transparent, #03070f)",
+          pointerEvents: "none",
+        }} />
+        {/* Sign out — top right overlay */}
+        <div style={{
+          position: "absolute",
+          top: 14,
+          right: 18,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: 6,
+        }}>
+          <button
+            onClick={onLogout}
+            style={{
+              background: "rgba(3,7,15,0.65)",
+              color: theme.blue,
+              border: `1px solid ${theme.border}`,
+              borderRadius: 8,
+              padding: "6px 12px",
+              fontSize: 11,
+              cursor: "pointer",
+              backdropFilter: "blur(6px)",
+              fontFamily: '"IBM Plex Mono", monospace',
+              letterSpacing: 1,
+            }}
+          >
             Sign out
           </button>
+        </div>
+      </div>
+
+      {/* Tagline bar below image */}
+      <div style={{
+        background: "#03070f",
+        borderBottom: `1px solid ${theme.borderSoft}`,
+        padding: "10px 20px",
+        textAlign: "center",
+      }}>
+        <div style={{
+          color: theme.muted2,
+          fontSize: 11,
+          letterSpacing: 4,
+          textTransform: "uppercase",
+          fontFamily: '"IBM Plex Mono", monospace',
+        }}>
+          NOAA Storm Events Database &nbsp;—&nbsp; 5-Year Lookback
         </div>
       </div>
     </div>
@@ -669,19 +724,233 @@ function AddressLookupBand({ address }) {
   );
 }
 
+// ─── US State SVG Map ─────────────────────────────────────────────────────────
+// Simplified state paths scaled to a 960x600 viewBox (standard US Albers projection)
+
+const STATE_PATHS = {
+  "Alabama": "M 553 340 L 560 340 L 565 370 L 562 400 L 548 400 L 543 370 Z",
+  "Alaska": "M 120 460 L 160 450 L 170 480 L 140 490 Z",
+  "Arizona": "M 165 300 L 220 300 L 220 370 L 165 370 Z",
+  "Arkansas": "M 510 300 L 550 300 L 548 340 L 508 338 Z",
+  "California": "M 110 230 L 155 210 L 165 300 L 130 350 L 105 310 Z",
+  "Colorado": "M 270 250 L 350 250 L 350 310 L 270 310 Z",
+  "Connecticut": "M 720 190 L 740 188 L 742 205 L 720 207 Z",
+  "Delaware": "M 695 220 L 708 218 L 710 235 L 695 237 Z",
+  "Florida": "M 560 390 L 600 385 L 620 430 L 590 460 L 560 440 L 548 410 Z",
+  "Georgia": "M 560 340 L 600 338 L 602 385 L 560 390 L 548 370 Z",
+  "Hawaii": "M 230 490 L 280 485 L 278 500 L 228 505 Z",
+  "Idaho": "M 175 155 L 220 145 L 225 230 L 195 245 L 175 210 Z",
+  "Illinois": "M 530 240 L 560 238 L 558 300 L 528 302 Z",
+  "Indiana": "M 560 238 L 585 236 L 583 295 L 558 298 Z",
+  "Iowa": "M 470 215 L 530 212 L 530 250 L 470 252 Z",
+  "Kansas": "M 370 270 L 470 268 L 470 315 L 370 317 Z",
+  "Kentucky": "M 575 278 L 640 272 L 642 305 L 575 308 Z",
+  "Louisiana": "M 490 370 L 545 368 L 548 400 L 520 415 L 490 405 Z",
+  "Maine": "M 755 135 L 780 128 L 785 165 L 758 168 Z",
+  "Maryland": "M 668 228 L 710 222 L 712 242 L 668 248 Z",
+  "Massachusetts": "M 722 175 L 758 170 L 760 188 L 722 192 Z",
+  "Michigan": "M 568 175 L 608 168 L 612 215 L 570 218 Z",
+  "Minnesota": "M 450 145 L 510 138 L 512 215 L 450 218 Z",
+  "Mississippi": "M 527 305 L 555 303 L 558 370 L 528 372 Z",
+  "Missouri": "M 470 265 L 535 262 L 537 315 L 470 318 Z",
+  "Montana": "M 195 120 L 320 112 L 322 185 L 195 192 Z",
+  "Nebraska": "M 370 230 L 470 225 L 470 270 L 370 275 Z",
+  "Nevada": "M 148 215 L 195 205 L 200 300 L 165 305 L 148 270 Z",
+  "New Hampshire": "M 735 158 L 752 155 L 755 185 L 737 188 Z",
+  "New Jersey": "M 700 205 L 718 202 L 720 228 L 700 230 Z",
+  "New Mexico": "M 235 310 L 310 308 L 312 380 L 235 382 Z",
+  "New York": "M 648 175 L 718 165 L 720 205 L 648 212 Z",
+  "North Carolina": "M 608 288 L 688 278 L 692 308 L 608 315 Z",
+  "North Dakota": "M 350 145 L 450 138 L 452 185 L 350 192 Z",
+  "Ohio": "M 598 228 L 640 222 L 642 272 L 598 278 Z",
+  "Oklahoma": "M 368 315 L 490 312 L 492 355 L 368 358 Z",
+  "Oregon": "M 130 165 L 195 155 L 198 230 L 132 238 Z",
+  "Pennsylvania": "M 640 198 L 700 192 L 702 228 L 640 235 Z",
+  "Rhode Island": "M 740 188 L 752 186 L 754 200 L 740 202 Z",
+  "South Carolina": "M 608 308 L 648 305 L 650 342 L 608 345 Z",
+  "South Dakota": "M 350 185 L 450 180 L 452 228 L 350 232 Z",
+  "Tennessee": "M 548 305 L 638 298 L 640 328 L 548 335 Z",
+  "Texas": "M 312 318 L 460 312 L 465 420 L 380 455 L 310 420 Z",
+  "Utah": "M 215 240 L 270 235 L 272 315 L 215 320 Z",
+  "Vermont": "M 718 152 L 736 148 L 738 175 L 718 178 Z",
+  "Virginia": "M 638 258 L 708 248 L 710 282 L 638 288 Z",
+  "Washington": "M 130 120 L 195 112 L 198 160 L 130 168 Z",
+  "West Virginia": "M 620 248 L 660 242 L 662 278 L 620 285 Z",
+  "Wisconsin": "M 510 162 L 555 158 L 558 212 L 510 218 Z",
+  "Wyoming": "M 270 190 L 355 183 L 357 248 L 270 255 Z",
+};
+
+// Approximate center points for each state (for pin placement)
+const STATE_CENTERS = {
+  "Alabama": [553, 370], "Alaska": [145, 470], "Arizona": [192, 335],
+  "Arkansas": [529, 320], "California": [135, 280], "Colorado": [310, 280],
+  "Connecticut": [730, 197], "Delaware": [702, 227], "Florida": [580, 420],
+  "Georgia": [575, 362], "Hawaii": [253, 492], "Idaho": [197, 195],
+  "Illinois": [544, 268], "Indiana": [571, 265], "Iowa": [500, 232],
+  "Kansas": [420, 293], "Kentucky": [607, 290], "Louisiana": [517, 390],
+  "Maine": [768, 148], "Maryland": [689, 237], "Massachusetts": [740, 181],
+  "Michigan": [588, 192], "Minnesota": [480, 178], "Mississippi": [541, 338],
+  "Missouri": [502, 290], "Montana": [257, 150], "Nebraska": [420, 250],
+  "Nevada": [172, 257], "New Hampshire": [744, 170], "New Jersey": [709, 215],
+  "New Mexico": [272, 344], "New York": [683, 188], "North Carolina": [648, 297],
+  "North Dakota": [400, 163], "Ohio": [619, 250], "Oklahoma": [429, 334],
+  "Oregon": [163, 197], "Pennsylvania": [670, 213], "Rhode Island": [746, 194],
+  "South Carolina": [628, 326], "South Dakota": [400, 205], "Tennessee": [593, 316],
+  "Texas": [387, 375], "Utah": [242, 277], "Vermont": [727, 163],
+  "Virginia": [673, 265], "Washington": [163, 140], "West Virginia": [640, 263],
+  "Wisconsin": [532, 185], "Wyoming": [312, 218],
+};
+
+function StateMap({ stateName, lat, lon }) {
+  if (!stateName || !STATE_PATHS[stateName]) {
+    // International or unknown — show coordinates only
+    return (
+      <div style={{
+        background: "#030810",
+        border: `1px solid ${theme.borderSoft}`,
+        borderRadius: 10,
+        padding: "14px 16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 120,
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ color: theme.muted2, fontSize: 9, letterSpacing: 2.5, textTransform: "uppercase", fontFamily: '"IBM Plex Mono", monospace', marginBottom: 6 }}>
+            COORDINATES
+          </div>
+          <div style={{ color: theme.blueBright, fontSize: 13, fontFamily: '"IBM Plex Mono", monospace' }}>
+            {lat}, {lon}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const pinCenter = STATE_CENTERS[stateName] || [480, 300];
+
+  return (
+    <div style={{
+      background: "#030810",
+      border: `1px solid ${theme.borderSoft}`,
+      borderRadius: 10,
+      overflow: "hidden",
+      position: "relative",
+    }}>
+      <svg
+        viewBox="100 100 860 480"
+        style={{ width: "100%", display: "block" }}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* Dot grid background */}
+        <defs>
+          <pattern id="dotgrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.8" fill="#0d2040" />
+          </pattern>
+          <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#76a8ff" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#76a8ff" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        <rect x="0" y="0" width="960" height="600" fill="url(#dotgrid)" />
+
+        {/* All states — dimmed */}
+        {Object.entries(STATE_PATHS).map(([name, path]) => (
+          <path
+            key={name}
+            d={path}
+            fill={name === stateName ? "#0d2a4a" : "#060e1a"}
+            stroke={name === stateName ? "#17325f" : "#0d1f35"}
+            strokeWidth={name === stateName ? "1.5" : "0.8"}
+          />
+        ))}
+
+        {/* Highlighted state subtle inner glow */}
+        {STATE_PATHS[stateName] && (
+          <path
+            d={STATE_PATHS[stateName]}
+            fill="none"
+            stroke="#76a8ff"
+            strokeWidth="1"
+            opacity="0.4"
+          />
+        )}
+
+        {/* Pin glow halo */}
+        <circle
+          cx={pinCenter[0]}
+          cy={pinCenter[1]}
+          r="22"
+          fill="url(#pinGlow)"
+        />
+
+        {/* Pin outer ring */}
+        <circle
+          cx={pinCenter[0]}
+          cy={pinCenter[1]}
+          r="8"
+          fill="none"
+          stroke="#76a8ff"
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+
+        {/* Pin center dot */}
+        <circle
+          cx={pinCenter[0]}
+          cy={pinCenter[1]}
+          r="4"
+          fill="#76a8ff"
+          style={{ filter: "drop-shadow(0 0 4px #76a8ff)" }}
+        />
+
+        {/* State label */}
+        <text
+          x={pinCenter[0]}
+          y={pinCenter[1] + 22}
+          textAnchor="middle"
+          fill="#4d6797"
+          fontSize="11"
+          fontFamily="IBM Plex Mono, monospace"
+          letterSpacing="1"
+        >
+          {stateName.toUpperCase()}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
 function SummaryCards({ data }) {
   const risk = getRiskStyle(data.riskLevel);
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: SECTION_GAP, marginBottom: SECTION_GAP }}>
-      <Panel>
-        <SectionLabel>Location Identified</SectionLabel>
-        <div style={{ color: theme.blueBright, fontWeight: 800, fontSize: 17, lineHeight: 1.25, marginBottom: 8 }}>{data.location.county}, {data.location.state}</div>
-        <div style={{ color: theme.muted, fontSize: 13, fontFamily: '"IBM Plex Mono", monospace' }}>{data.location.address}</div>
-      </Panel>
+      {/* Left column: location info + map */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <Panel style={{ flex: "0 0 auto" }}>
+          <SectionLabel>Location Identified</SectionLabel>
+          <div style={{ color: theme.blueBright, fontWeight: 800, fontSize: 17, lineHeight: 1.25, marginBottom: 8 }}>
+            {data.location.county}, {data.location.state}
+          </div>
+          <div style={{ color: theme.muted, fontSize: 13, fontFamily: '"IBM Plex Mono", monospace' }}>
+            {data.location.address}
+          </div>
+        </Panel>
+        <StateMap
+          stateName={data.location.state}
+          lat={data.location.lat}
+          lon={data.location.lon}
+        />
+      </div>
+
+      {/* Right column: risk assessment */}
       <div style={{ background: risk.bg, border: `1px solid ${risk.border}`, borderRadius: 12, padding: 18 }}>
         <SectionLabel>Hail Risk Assessment</SectionLabel>
         <div style={{ color: risk.text, fontWeight: 800, fontSize: 22, marginBottom: 8 }}>{data.riskLevel}</div>
-        <div style={{ color: "#d5b07a", fontSize: 13, fontFamily: '"IBM Plex Mono", monospace' }}>{data.stats.yearsSearched} · {data.stats.totalHailEvents} events found</div>
+        <div style={{ color: "#d5b07a", fontSize: 13, fontFamily: '"IBM Plex Mono", monospace' }}>
+          {data.stats.yearsSearched} · {data.stats.totalHailEvents} events found
+        </div>
       </div>
     </div>
   );
