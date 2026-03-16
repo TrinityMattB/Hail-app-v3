@@ -1,15 +1,37 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npm install:*)",
-      "Bash(npm run:*)",
-      "Bash(\"e:/flutter projects/newpwa/hail-app/.env.local\")",
-      "Bash(python3 -:*)",
-      "Bash(python3 -c \":*)",
-      "Bash(awk 'NR>=215 && NR<=320' src/App.jsx)",
-      "Bash(awk 'NR>=215 && NR<=340' src/App.jsx)",
-      "Bash(awk 'NR>=340 && NR<=500' src/App.jsx)",
-      "Bash(awk 'NR>=500 && NR<=592' src/App.jsx)"
-    ]
+const fetch = require("node-fetch");
+
+module.exports = async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.status(204).end();
+    return;
   }
-}
+
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    res.status(500).json({ error: "ANTHROPIC_API_KEY not configured." });
+    return;
+  }
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "web-search-2025-03-05",
+      },
+      body: JSON.stringify(req.body),
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message || "Anthropic request failed." });
+  }
+};
